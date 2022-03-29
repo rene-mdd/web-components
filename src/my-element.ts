@@ -1,63 +1,58 @@
-/**
- * @license
- * Copyright 2019 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 
-import {LitElement, html, css} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { dropdown } from './styles/dropdown';
 
-/**
- * An example element.
- *
- * @fires count-changed - Indicates when the count changes
- * @slot - This element has a slot
- * @csspart button - The button
- */
 @customElement('my-element')
 export class MyElement extends LitElement {
-  static override styles = css`
-    :host {
-      display: block;
-      border: solid 1px gray;
-      padding: 16px;
-      max-width: 800px;
-    }
-  `;
+  constructor() {
+    super();
+    // for encapsulated styles we would need to declare them here and use this attachShadow property.
+    // const shadow = this.attachShadow({ mode: 'open' });
+  }
+    // external styles
+  static override styles = [dropdown];
 
-  /**
-   * The name to say "Hello" to.
-   */
   @property()
-  name = 'World';
-
-  /**
-   * The number of times the button has been clicked.
-   */
-  @property({type: Number})
-  count = 0;
+  first = 'I am here!';
+  second = 'I am also here!';
+  third = 'Mee toooo!!';
 
   override render() {
     return html`
-      <h1>${this.sayHello(this.name)}!</h1>
-      <button @click=${this._onClick} part="button">
-        Click Count: ${this.count}
-      </button>
-      <slot></slot>
+    <button class="accordion" @click="${this._openAcc}">Section 1</button>
+    <div class="panel">
+      <p>${this.first}</p>
+    </div>
+    
+    <button class="accordion" @click="${this._openAcc}">Section 2</button>
+    <div class="panel">
+      <p>${this.second}</p>
+    </div>
+    
+    <button class="accordion" @click="${this._openAcc}">Section 3</button>
+    <div class="panel">
+      <p>${this.third}</p>
+    </div>
     `;
   }
 
-  private _onClick() {
-    this.count++;
-    this.dispatchEvent(new CustomEvent('count-changed'));
-  }
+  private _openAcc(e: Event) {
 
-  /**
-   * Formats a greeting
-   * @param name The name to say "Hello" to
-   */
-  sayHello(name: string): string {
-    return `Hello, ${name}`;
+    let myEvent = new CustomEvent('my-event', {
+      detail: { message: 'my-event happened.' },
+      bubbles: true,
+      composed: true,
+    });
+    let element = (e.target as HTMLElement);
+    let elementSibling = (element.nextElementSibling as HTMLElement);
+    element.classList.toggle("active");
+    if (elementSibling.style.maxHeight) {
+      elementSibling.style.maxHeight = "";
+    } else {
+      elementSibling.style.maxHeight = elementSibling.scrollHeight + "px";
+    }
+    this.dispatchEvent(myEvent);
   }
 }
 
